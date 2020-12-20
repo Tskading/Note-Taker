@@ -2,7 +2,9 @@ const { notStrictEqual } = require("assert");
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const database = require("./db/db.json")
+const database = require("./db/db.json");
+const { v4: uuidv4 } = require("uuid");
+uuidv4();
 
 
 const app = express();
@@ -21,19 +23,12 @@ app.get("/api/notes", function(req, res) {
 
         // console.log(JSON.parse(data));
 
+        // THEN parse the file contents with JSON.parse()
         let dbParse = JSON.parse(data);
-
+        // res.JSON() - send the parsed data back 
         res.json(dbParse);
-
-        
-
     });
 
-    // THEN parse the file contents with JSON.parse() to get the real data
-
-    // res.JSON() - send the parsed data back 
-
-    // Should be able to load the client side and see test note in db.json
 });
 
 app.post("/api/notes", function(req, res) {
@@ -41,22 +36,25 @@ app.post("/api/notes", function(req, res) {
     // access the POSTed data in req.body
     let userNotes = req.body;
 
+    let uniqueid = uuidv4();
+    userNotes["id"] = uniqueid;
+
     // use fs module to read the file
     fs.readFile("./db/db.json", "utf8", (err, data) => {
         if (err) throw (err);
-
+        // THEN parse the file contents with JSON.parse() to get the real data
         console.log(JSON.parse(data));
-
+        
         let dbParse = JSON.parse(data);
-
+        // push the req.body to the array list
         dbParse.push(req.body);
 
         let newNote = JSON.stringify(dbParse);
-        
+        // JSON.stringigy() the array list back into a JSON string
         fs.writeFile("./db/db.json", newNote, (err) => {
             if (err)  throw err;
             else {
-                console.log("Created new note ;)");
+                console.log("Created new note!");
                 res.json(newNote);
             }
         })      
@@ -64,22 +62,19 @@ app.post("/api/notes", function(req, res) {
 
     });
 
-
-    // THEN parse the file contents with JSON.parse() to get the real data
-
-    // push the req.body to the array list
-
-    // JSON.stringigy() the array list back into a JSON string
-
-    // THEN save the contents back to the db.json file with the fs module.
-
 });
 
-app.delete("/api/notes/:id", function(req, res) {
+
+app.delete("/api/notes/:id", (req, res) => {
 
     // access :id from req.params.id
+    const uniqueid = req.params.id
+    let notes = [];
 
     // use fs module to read the file
+
+
+  
 
     // THEN parse the file contents with JSON.parse() to the real data
 
