@@ -71,22 +71,29 @@ app.delete("/api/notes/:id", (req, res) => {
     const uniqueid = req.params.id
     let notes = [];
 
+    console.log(uniqueid);
+
     // use fs module to read the file
+    fs.readFile("./db/db.json", "utf8", (err, data) => {
+        if (err) throw err;
 
+        // console.log(data);
+        // THEN parse the file contents with JSON.parse()
+        let note = JSON.parse(data);
+        // console.log(note);
 
-  
+        // use the Array.filter() to filter out matching element
+        const userNotes = note.filter(({id}) => id != uniqueid);        
+        let newArray = JSON.stringify(userNotes);
 
-    // THEN parse the file contents with JSON.parse() to the real data
+        // console.log(newArray);
 
-    // OPTION A
-        // Find the matching index using .findIndex()
-        // remove target element using .splice()
-
-    // OPTION B
-        // use the Array.filter() to filter out matching element - something about using let instead of const...
-        // myArray = myArray.filter( element => element.id !== req.params.id)
-
-    // return any type of success message. 
+        fs.writeFile("./db/db.json", newArray, (err) => {
+            if (err) throw err;
+            return res.json(true);
+        })
+    });    
+    
 });
 
 app.get("/notes", function(req, res) {
